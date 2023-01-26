@@ -1,7 +1,7 @@
 ////// should put these files to 'js' folder /////
-import * as THREE from '../modules/three.module.js';
-import {OrbitControls} from '../modules/OrbitControls.js';
-import {GLTFLoader} from '../modules/GLTFLoader.js';
+import * as THREE from './js/three.module.js';
+import {OrbitControls} from './js/OrbitControls.js';
+import {GLTFLoader} from './js/GLTFLoader.js';
 
 ///// global variables /////
 let scene, camera, renderer, orbit;
@@ -56,12 +56,12 @@ initProgressBar();
 function initScene(){
      scene = new THREE.Scene();     
      scene.background = cubeTextureLoader.load([
-          './assets/lightblue/right.png',
-          './assets/lightblue/left.png',
-          './assets/lightblue/top.png',
-          './assets/lightblue/bot.png',
-          './assets/lightblue/front.png',
-          './assets/lightblue/back.png',          
+          './models/lightblue/right.png',
+          './models/lightblue/left.png',
+          './models/lightblue/top.png',
+          './models/lightblue/bot.png',
+          './models/lightblue/front.png',
+          './models/lightblue/back.png',          
      ]);
 
      camera = new THREE.PerspectiveCamera(
@@ -130,13 +130,13 @@ function initSound(){
      mugungwhaSound = new THREE.Audio(audioListener);
      //younghee.add(audioListener);
      
-     audioLoader.load('./sounds/squidgameremix2.mp3', function(buffer){
+     audioLoader.load('./audios/squidgameremix2.mp3', function(buffer){
           bgmSound.setBuffer(buffer);
           bgmSound.setLoop(false);
           bgmSound.setVolume(0.25);
-          //bgmSound.play();
+          bgmSound.play();
      })
-     audioLoader.load('./sounds/sas1009.mp3', function(buffer){
+     audioLoader.load('./audios/sas1009.mp3', function(buffer){
           mugungwhaSound.setBuffer(buffer);
           mugungwhaSound.setLoop(true);
           mugungwhaSound.setVolume(0.8);
@@ -157,7 +157,7 @@ async function delay(ms){
 
 class Doll {
      constructor(){
-          modelLoader.load('./models/squid_game_-_giant_doll/scene.gltf', function(gltf){
+          modelLoader.load('./models/giant_doll/scene.gltf', function(gltf){
                scene.add(gltf.scene);
                gltf.scene.traverse(function(node){
                     if(node.isMesh){ 
@@ -222,8 +222,7 @@ function initPlayGround(){
      const groundMaterial = new THREE.MeshLambertMaterial({
           //color: 0xc79997,
           //map: textureLoader.load('./assets/Sand_004_Height.png'),
-          //map: textureLoader.load('../landspeeder/skyboxes/blue/bkg1_top.png'),
-          map: textureLoader.load('../squidGameGlass/assets/glass-plate.webp'),
+         
           wireframe: false,
           side: THREE.DoubleSide,
           transparent: true,
@@ -241,7 +240,7 @@ function initGoalGround(){
      const groundMaterial = new THREE.MeshStandardMaterial({
           color: 0x0c8900,
           //map: textureLoader.load('./assets/Sand_004_Height.png'),
-          map: textureLoader.load('./assets/Wall_Stone_022_roughness.jpg'),
+          
           wireframe: false,
           side: THREE.DoubleSide,
      })
