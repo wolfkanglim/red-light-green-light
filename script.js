@@ -1,4 +1,3 @@
-////// should put these files to 'js' folder /////
 import * as THREE from './js/three.module.js';
 import {OrbitControls} from './js/OrbitControls.js';
 import {GLTFLoader} from './js/GLTFLoader.js';
@@ -12,12 +11,12 @@ let bgmSound, mugungwhaSound;
 let lookBackTime, lookForwardTime, turningTime;
 let player, playerRed, playerBlue;
 let facingBack = false;
-//let chaseCam, chaseCamPivot;
 //let view = new THREE.Vector3();
 let TIME_LIMIT = 60;
 let gameStat = 'loading';
 let DEAD_PLAYERS = 0;
 let SAFE_PLAYERS = 0;
+let cameraTop, insetWidth, insetHeight;
 
 const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
@@ -47,9 +46,6 @@ initStartGround();
 initSound();
 initOrbit();
 initProgressBar();
-//initChaseCamera();
-//initGameStart();
-
 
 ///// init three.js /////
 
@@ -71,7 +67,13 @@ function initScene(){
           12000
      )
      camera.position.set(0, 600, 2200); 
-     //need cmtout when use chase camera
+     camera.lookAt(0, 0, -1200);
+     
+     //camera top
+     cameraTop = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 500);
+     cameraTop.position.set(0, 400, -900);
+     cameraTop.lookAt(0, 400, -1200);
+     
      
      renderer = new THREE.WebGLRenderer({
           antialias: true,
@@ -90,17 +92,6 @@ function initOrbit(){
      orbit.target.set(0, 10, -900);       
 }
      
-// chase camera // can switch to initOrbit//
-/* function initChaseCamera(){
-     chaseCam = new THREE.Object3D();
-     chaseCam.position.set(0, 700, 1500);
-
-     chaseCamPivot = new THREE.Object3D();
-     chaseCamPivot.position.set(0, 100, 900);
-
-     chaseCam.add(chaseCamPivot); 
-     scene.add(chaseCam);
-} */
 
 function initLights(){
      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -325,13 +316,6 @@ function initSphere(){
      scene.add(sphere);         
 }
 
-///// red light green light /////
-/* if(facingBack){
-     light.material.color = 0x00ff00;
-     } else {
-          light.material.color = 0xff0000;
-     } 
-*/
 
 function initCube(){
      const cubeGeometry = new THREE.BoxGeometry(120, 120, 120, 2);
@@ -578,7 +562,10 @@ function restart(){
     //initPlayers();
     initGameStart();  
 } 
-console.log(players);
+
+window.addEventListener('resize', onResize);
+onResize();
+//console.log(players);
 ///// animation /////
 
 function animate(){
@@ -602,22 +589,32 @@ function animate(){
      triangular.rotation.y += 0.01;
      triangular.rotation.z += 0.008;
      orbit.update(); 
-     //updateChaseCamera();
-     renderer.render(scene, camera);
      requestAnimationFrame(animate);
+     //update Camera();
+     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+     renderer.render(scene, camera);
+     
+
+     renderer.clearDepth();
+     renderer.setScissorTest(true);
+     renderer.setScissor(window.innerWidth - insetWidth - 10, window.innerHeight - insetHeight - 30, insetWidth, insetHeight);
+     renderer.setViewport(window.innerWidth - insetWidth - 10, window.innerHeight - insetHeight - 30, insetWidth, insetHeight);
+     renderer.render(scene, cameraTop);
+     renderer.setScissorTest(false);
 }
 
-/* function updateChaseCamera(){     
-     chaseCamPivot.getWorldPosition(view);
-     if(view.y < 1) view.y = 1;
-     camera.position.lerpVectors(camera.position, view, 0.05);
-} */
 
-window.addEventListener('resize', function(){
+function onResize(){     
      camera.aspect  = window.innerWidth/ window.innerHeight;
      camera.updateProjectionMatrix();
      renderer.setSize(window.innerWidth, window.innerHeight);
-})
+     
+
+     insetWidth = window.innerWidth * 0.3;
+     insetHeight = window.innerHeight * 0.4;
+     cameraTop.aspect = insetWidth/insetHeight;
+     cameraTop.updateProjectionMatrix();    
+}
 
 ///// player run key down event need to add left right arrow/////
 window.addEventListener('keydown', (e) => {
